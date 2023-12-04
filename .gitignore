@@ -1,0 +1,5 @@
+.vscode
+build
+!build/Makefile
+temp
+upload.sh
