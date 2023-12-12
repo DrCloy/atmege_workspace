@@ -1,10 +1,9 @@
 #ifndef DS3231_h
 #define DS3231_h
 
-
 #include <stdio.h>
 #include <avr/io.h>
-#include <util/delay.h>
+#include <avr/iom128.h>
 #include "i2c.h"
 
 
@@ -29,10 +28,6 @@ typedef struct
 	uint8_t sec;
 	uint8_t min;
 	uint8_t hour;
-	uint8_t weekDay;
-	uint8_t date;
-	uint8_t month;
-	uint8_t year;
 }rtc_t;
 
 
@@ -46,9 +41,11 @@ uint8_t bcdToDec(uint8_t val){
     return( (val/16*10) + (val%16) );
 }
 
+void ds3231_init() {
+    i2c_init();
+}
 
-
-void DS3231_setTime(rtc_t realTime){
+void ds3231_setTime(rtc_t realTime){
     
     
     i2c_start();
@@ -56,17 +53,13 @@ void DS3231_setTime(rtc_t realTime){
     i2c_write(0x00);    //move pointer location 0 which is seconds
     i2c_write(decimalToBcd(realTime.sec));
     i2c_write(decimalToBcd(realTime.min));
-    i2c_write(decimalToBcd(realTime.hour));
-    i2c_write(decimalToBcd(realTime.weekDay));
-    i2c_write(decimalToBcd(realTime.date));
-    i2c_write(decimalToBcd(realTime.month));
-    i2c_write(decimalToBcd(realTime.year));
+    i2c_write(decimalToBcd(realTime.hour));  // when bit 6 is low, 24 hour mode
     i2c_stop();
     
     
 }
 
-void DS3231_getTime(rtc_t* realTime){
+void ds3231_getTime(rtc_t* realTime){
     
     i2c_start();
     i2c_write(DS3231_ADDRESS_W);
@@ -79,10 +72,6 @@ void DS3231_getTime(rtc_t* realTime){
     realTime->sec        = bcdToDec(i2c_read(1) & 0x7f);
     realTime->min        = bcdToDec(i2c_read(1));
     realTime->hour       = bcdToDec(i2c_read(1) & 0x3f);
-    realTime->weekDay    = bcdToDec(i2c_read(1));
-    realTime->date       = bcdToDec(i2c_read(1));
-    realTime->month      = bcdToDec(i2c_read(1));
-    realTime->year       = bcdToDec(i2c_read(1));
     
 }
 
