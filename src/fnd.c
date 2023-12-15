@@ -17,7 +17,7 @@
 #define FND_SEL_1        PG1
 #define FND_SEL_2        PG2
 #define FND_SEL_3        PG3
-#define FND_DP           (1 << 7)
+#define FND_DP           PC7
 
 volatile uint8_t fnd_number[10] = {
     0x3f, 0x06, 0x5b, 0x4f, 0x66, 
@@ -29,6 +29,14 @@ void fnd_init() {
     FND_SELECT = ((1 << FND_SEL_0) | (1 << FND_SEL_1) | (1 << FND_SEL_2) | (1 << FND_SEL_3));
 }
 
+void fnd_print(uint8_t *value, int dp_index) {
+    for (int i = 0; i < 4; i++) {
+        FND_DIGIT_DATA = value[i] | ((i == dp_index) ? (1 << FND_DP) : 0);
+        FND_SELECT_DATA = 1 << (3 - i);
+        _delay_us(100);
+    }
+}
+
 void fnd_print_function(int index) {
     uint8_t index_value[4];
     index_value[0] = 0x71; // F
@@ -36,11 +44,7 @@ void fnd_print_function(int index) {
     index_value[2] = fnd_number[(index / 10)];
     index_value[3] = fnd_number[(index % 10)];
 
-    for (int i = 0; i < 4; i++) {
-        FND_DIGIT_DATA = index_value[i] | ((i == 1) ? FND_DP : 0);
-        FND_SELECT_DATA = 1 << (3 - i);
-        _delay_us(100);
-    }
+    fnd_print(index_value, 1);
 }
 
 void fnd_print_time() {
@@ -49,15 +53,21 @@ void fnd_print_time() {
         ds3231_getTime(&current_time);
 
         uint8_t fnd_value[4];
-        fnd_value[0] = current_time.hour / 10;
-        fnd_value[1] = current_time.hour % 10;
-        fnd_value[2] = current_time.min / 10;
-        fnd_value[3] = current_time.min % 10;
+        fnd_value[0] = fnd_number[current_time.hour / 10];
+        fnd_value[1] = fnd_number[current_time.hour % 10];
+        fnd_value[2] = fnd_number[current_time.min / 10];
+        fnd_value[3] = fnd_number[current_time.min % 10];
 
-        for (int i = 0; i < 4; i++) {
-            FND_DIGIT_DATA = fnd_number[fnd_value[i]] | ((i == 1) ? FND_DP : 0);
-            FND_SELECT_DATA = 1 << (3 - i);
-            _delay_us(100);
-        }
+        fnd_print(fnd_value, 1);
     }
+}
+
+void fnd_print_setting_time(rtc_t setting_time) {
+    uint8_t fnd_value[4];
+        fnd_value[0] = fnd_number[setting_time.hour / 10];
+        fnd_value[1] = fnd_number[setting_time.hour % 10];
+        fnd_value[2] = fnd_number[setting_time.min / 10];
+        fnd_value[3] = fnd_number[setting_time.min % 10];
+
+        fnd_print(fnd_value, 1);
 }
