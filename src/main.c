@@ -23,6 +23,26 @@ void init() {
 	sei();
 }
 
+void set_time() {
+	rtc_t settime_time = {0, 0, 0};
+	int setting = 0;
+
+	while(1) {
+		int sw = switch_read();
+
+		if (sw == SWITCH_EVENT_BOTH) {
+			setting += 1;
+			if (setting == 2) {
+				break;
+			}
+		} else if (sw == SWITCH_EVENT_UP) {
+			if (setting == SETTING_HOUR) {
+				settime_time.hour += 1;
+			}
+		}
+	}
+}
+
 int main() {
 	// const uint8_t menu_index_max = sizeof(menu) / sizeof(struct menu_t) - 1;
 	const uint8_t menu_index_max = 10;
@@ -35,9 +55,9 @@ int main() {
         enum switch_event_t sw = switch_read();
         if (sw == SWITCH_EVENT_BOTH)
             menu[menu_index].func();
-        if (sw == SWITCH_EVENT_LEFT)
+        if (sw == SWITCH_EVENT_DOWN)
             menu_index--;
-        if (sw == SWITCH_EVENT_RIGHT)
+        if (sw == SWITCH_EVENT_UP)
             menu_index++;
         
         if (menu_index < 0)

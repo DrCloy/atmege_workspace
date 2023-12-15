@@ -3,8 +3,8 @@
 
 enum switch_event_t {
     SWITCH_EVENT_NONE = 0x00, // 아무 스위치도 눌리지 않았을 때
-    SWITCH_EVENT_LEFT = 0x01, // 왼쪽 스위치가 눌렸을 때
-    SWITCH_EVENT_RIGHT = 0x02, // 오른쪽 스위치가 눌렸을 때
+    SWITCH_EVENT_UP = 0x01, // 왼쪽 스위치가 눌렸을 때
+    SWITCH_EVENT_DOWN = 0x02, // 오른쪽 스위치가 눌렸을 때
     SWITCH_EVENT_BOTH = 0x03, // 양쪽 스위치가 모두 눌렸을 때 
 };
 

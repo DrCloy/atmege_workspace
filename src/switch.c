@@ -7,16 +7,16 @@
 #include "switch.h"
 
 
-#define SWITCH_GPIO_UP PE5
-#define SWITCH_GPIO_DOWN PE4
+#define SWITCH_GPIO_UP PE4
+#define SWITCH_GPIO_DOWN PE5
 /** @brief Bouncing 방지를 위해 클릭 후 잠시 대기하는 시간(us)*/
 #define SWITCH_TIME_SHORT ((50UL) * (1000UL))
 /** @brief 스위치 클릭 이벤트 발생 주기(us)*/
 #define SWITCH_TIME_LONG ((200UL) * (1000UL))
 
 enum switch_index {
-    SWITCH_L = 0,
-    SWITCH_R,
+    SWITCH_U = 0,
+    SWITCH_D,
     SWITCH_COUNT,
 };
 
@@ -146,8 +146,8 @@ enum switch_event_t switch_read(void) {
     /*
     * 스위치의 눌림 여부를 결정한다
     */
-    bool clicked_l = switch_state_machine(&_switch[SWITCH_L]);
-    bool clicked_r = switch_state_machine(&_switch[SWITCH_R]);
+    bool clicked_u = switch_state_machine(&_switch[SWITCH_U]);
+    bool clicked_d = switch_state_machine(&_switch[SWITCH_D]);
 
     /*
     * 다음으로 버튼이 두 개인 경우를 고려하자.
@@ -156,21 +156,21 @@ enum switch_event_t switch_read(void) {
     * 물론 그 차이가 1ms이하라면 그런 문제가 발생하지 않겠지만, 이는 거의 불가능하다.
     * 이를 해결하기 위해서는 한쪽 버튼이 Long-On으로 넘어갈 때 다른 쪽 버튼이 Short-On 상태에 있다면 강제로 Long-On상태로 넘겨버리면 된다.
     */
-    if (clicked_l && (_switch[SWITCH_R].state & SWITCH_STATE_SHORT_ON)) {
-        switch_copy(&_switch[SWITCH_R], &_switch[SWITCH_L]);
-        clicked_r = true;
+    if (clicked_u && (_switch[SWITCH_D].state & SWITCH_STATE_SHORT_ON)) {
+        switch_copy(&_switch[SWITCH_D], &_switch[SWITCH_U]);
+        clicked_d = true;
     }
-    if (clicked_r && (_switch[SWITCH_L].state & SWITCH_STATE_SHORT_ON)) {
-        switch_copy(&_switch[SWITCH_L], &_switch[SWITCH_R]);
-        clicked_l = true;
+    if (clicked_d && (_switch[SWITCH_U].state & SWITCH_STATE_SHORT_ON)) {
+        switch_copy(&_switch[SWITCH_U], &_switch[SWITCH_D]);
+        clicked_d = true;
     }
 
     enum switch_event_t ret = 0;
-    if (clicked_l) {
-        ret |= SWITCH_EVENT_LEFT;
+    if (clicked_u) {
+        ret |= SWITCH_EVENT_UP;
     }
-    if (clicked_r) {
-        ret |= SWITCH_EVENT_RIGHT;
+    if (clicked_d) {
+        ret |= SWITCH_EVENT_DOWN;
     }
 
     return ret;
