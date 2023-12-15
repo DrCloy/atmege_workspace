@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <util/delay.h>
 #include "ds3231.h"
-#include "switch.h"
 
 #define F_CPU 16000000UL
 #define FND_DIGIT        DDRC
@@ -42,19 +41,17 @@ void fnd_print_function(int index) {
 
 void fnd_print_time() {
     rtc_t current_time;
-    while (!switch_read()) {
-        ds3231_getTime(&current_time);
+    ds3231_getTime(&current_time);
 
-        uint8_t fnd_value[4];
-        fnd_value[0] = current_time.hour / 10;
-        fnd_value[1] = current_time.hour % 10;
-        fnd_value[2] = current_time.min / 10;
-        fnd_value[3] = current_time.min % 10;
+    uint8_t fnd_value[4];
+    fnd_value[0] = current_time.hour / 10;
+    fnd_value[1] = current_time.hour % 10;
+    fnd_value[2] = current_time.min / 10;
+    fnd_value[3] = current_time.min % 10;
 
-        for (int i = 0; i < 4; i++) {
-            FND_DIGIT_DATA = fnd_number[fnd_value[i]] | ((i == 1) ? FND_DP : 0);
-            FND_SELECT_DATA = 1 << (3 - i);
-            _delay_ms(20);
-        }
+    for (int i = 0; i < 4; i++) {
+        FND_DIGIT_DATA = fnd_number[fnd_value[i]] | ((i == 1) ? FND_DP : 0);
+        FND_SELECT_DATA = 1 << (3 - i);
+        _delay_ms(20);
     }
 }

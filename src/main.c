@@ -35,8 +35,11 @@ int main() {
         fnd_print_function(menu_index);
         
         enum switch_event_t sw = switch_wait_until_input();
-        if (sw == SWITCH_EVENT_BOTH)
-            menu[menu_index].func();
+        if (sw == SWITCH_EVENT_BOTH){
+			while (!switch_read()) {
+				menu[menu_index].func();
+			}
+		}
         if (sw == SWITCH_EVENT_LEFT)
             menu_index--;
         if (sw == SWITCH_EVENT_RIGHT)
