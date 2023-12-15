@@ -17,7 +17,7 @@ volatile static uint8_t blue = 0x00;
 volatile static uint8_t rgb_mode = RGB_R;
 
 SIGNAL(TIMER0_COMP_vect) {
-    // To change color per 100ms, 4ms timer interrupt occer 25 times
+    // RGB 값을 50ms에 1씩 바꿔준다. 
     timer_counter += 1;
     if (timer_counter == 25) {
         timer_counter = 0;
@@ -87,9 +87,9 @@ void led_init() {
     TCCR0 |= (1 << WGM01); // CTC mode
     TCCR0 |= (1 << CS02) | (1 << CS01); // prescaler 256
     // Calculate OCR0 for 4ms
-    // 4ms = ORC0 * (1 / (clk / prescaler))
-    // OCR0 = 4ms * (clk / prescaler) = 4ms * (16MHz / 256) = 250
-    OCR0 = 250;
+    // 2ms = ORC0 * (1 / (clk / prescaler))
+    // OCR0 = 2ms * (clk / prescaler) = 4ms * (16MHz / 256) = 125
+    OCR0 = 125;
 
     // Set timer1 for make 3 PWM
     // Timer Mode : 8 bit fast PWM Mode (WGM1 = 0101)
