@@ -9,10 +9,11 @@
 
 #define SWITCH_GPIO_UP PE4
 #define SWITCH_GPIO_DOWN PE5
-/** @brief Bouncing 방지를 위해 클릭 후 잠시 대기하는 시간(us)*/
-#define SWITCH_TIME_SHORT ((50UL) * (1000UL))
-/** @brief 스위치 클릭 이벤트 발생 주기(us)*/
-#define SWITCH_TIME_LONG ((200UL) * (1000UL))
+
+/** @brief Bouncing 방지를 위해 클릭 후 잠시 대기하는 시간(ms)*/
+#define SWITCH_TIME_SHORT 200UL
+/** @brief 스위치 클릭 이벤트 발생 주기(ms)*/
+#define SWITCH_TIME_LONG 500UL
 
 enum switch_index {
     SWITCH_U = 0,
@@ -128,12 +129,12 @@ void switch_init(void) {
 
     // 스위치 상태 판별에 필요한 timer2 설정
     // Mode : CTC Mode (WGM2 = 10)
-    // Period : 1us
-    // 1us = OCR2 * (1 / (clk / prescaler))
-    // OCR2 = 1us * (clk / prescaler) = 1us * (16MHz / prescaler) = 16 / prescaler
-    // persclaer = 1 -> OCR2 = 16 (CS2 = 001)
-    TCCR2 |= (1 << WGM21) | (1 << CS20);
-    OCR2 = 16;
+    // Period : 1ms
+    // 1ms = OCR2 * (1 / (clk / prescaler))
+    // OCR2 = 1ms * (16MHZ . prescaler)
+    // prescaler = 64 -> OCR2 = 250 (CS2 = 011)
+    TCCR2 |= (1 << WGM21) | (1 << CS20) | (1 << CS21);
+    OCR2 = 250;
     TIMSK |= (1 << OCIE2);
 }
 
