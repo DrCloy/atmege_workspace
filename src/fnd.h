@@ -2,8 +2,10 @@
 #define FND_H
 
 #include <stdint.h>
+#include "ds3231.h"
 
 void fnd_init();
-void fnd_print_time(uint8_t hour, uint8_t min);
+void fnd_print_function(int index);
+void fnd_print_time();
 
 #endif

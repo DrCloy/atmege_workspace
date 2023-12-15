@@ -2,6 +2,8 @@
 #include <avr/iom128.h>
 #include <stdint.h>
 #include <util/delay.h>
+#include "ds3231.h"
+#include "switch.h"
 
 #define F_CPU 16000000UL
 #define FND_DIGIT        DDRC
@@ -24,16 +26,35 @@ void fnd_init() {
     FND_SELECT = ((1 << FND_SEL_0) | (1 << FND_SEL_1) | (1 << FND_SEL_2) | (1 << FND_SEL_3));
 }
 
-void fnd_print_time(uint8_t hour, uint8_t min) {
-    uint8_t fnd_value[4];
-    fnd_value[0] = hour / 10;
-    fnd_value[1] = hour % 10;
-    fnd_value[2] = min / 10;
-    fnd_value[3] = min % 10;
+void fnd_print_function(int index) {
+    uint8_t index_value[4];
+    index_value[0] = 0x71; // F
+    index_value[1] = 0x3e; // U
+    index_value[2] = (index / 10);
+    index_value[3] = (index % 10);
 
     for (int i = 0; i < 4; i++) {
-        FND_DIGIT_DATA = fnd_number[fnd_value[i]] | ((i == 1) ? FND_DP : 0);
+        FND_DIGIT_DATA = fnd_number[index_value[i]] | ((i == 1) ? FND_DP : 0);
         FND_SELECT_DATA = 1 << (3 - i);
         _delay_ms(20);
+    }
+}
+
+void fnd_print_time() {
+    rtc_t current_time;
+    while (!switch_read()) {
+        ds3231_getTime(&current_time);
+
+        uint8_t fnd_value[4];
+        fnd_value[0] = current_time.hour / 10;
+        fnd_value[1] = current_time.hour % 10;
+        fnd_value[2] = current_time.min / 10;
+        fnd_value[3] = current_time.min % 10;
+
+        for (int i = 0; i < 4; i++) {
+            FND_DIGIT_DATA = fnd_number[fnd_value[i]] | ((i == 1) ? FND_DP : 0);
+            FND_SELECT_DATA = 1 << (3 - i);
+            _delay_ms(20);
+        }
     }
 }
