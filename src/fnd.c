@@ -33,7 +33,7 @@ void fnd_print(uint8_t *value, int dp_index) {
     for (int i = 0; i < 4; i++) {
         FND_DIGIT_DATA = value[i] | ((i == dp_index) ? (1 << FND_DP) : 0);
         FND_SELECT_DATA = 1 << (3 - i);
-        _delay_us(100);
+        _delay_ms(1);
     }
 }
 
