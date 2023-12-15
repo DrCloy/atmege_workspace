@@ -35,7 +35,7 @@ void set_time() {
 			if (setting == SETTING_HOUR) {
 				settime_time.hour -= 1;
 				if (settime_time.hour < 0) {
-					settime_time.hour = 24;
+					settime_time.hour = 23;
 				}
 			} else if (setting == SETTING_MIN) {
 				settime_time.min -= 1;
@@ -68,8 +68,7 @@ void init() {
 
 
 int main() {
-	// const uint8_t menu_index_max = sizeof(menu) / sizeof(struct menu_t) - 1;
-	const uint8_t menu_index_max = 10;
+	const uint8_t menu_index_max = sizeof(menu) / sizeof(struct menu_t) - 1;
 	int menu_index = 0;
 
 	init();
