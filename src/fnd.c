@@ -39,7 +39,7 @@ void fnd_print_function(int index) {
     for (int i = 0; i < 4; i++) {
         FND_DIGIT_DATA = index_value[i] | ((i == 1) ? FND_DP : 0);
         FND_SELECT_DATA = 1 << (3 - i);
-        _delay_us(20);
+        _delay_us(100);
     }
 }
 
@@ -57,7 +57,7 @@ void fnd_print_time() {
         for (int i = 0; i < 4; i++) {
             FND_DIGIT_DATA = fnd_number[fnd_value[i]] | ((i == 1) ? FND_DP : 0);
             FND_SELECT_DATA = 1 << (3 - i);
-            _delay_us(20);
+            _delay_us(100);
         }
     }
 }
