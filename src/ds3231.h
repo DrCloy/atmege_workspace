@@ -68,10 +68,7 @@ static inline void ds3231_getTime(rtc_t* realTime){
 }
 
 static inline void ds3231_init() {
-    rtc_t init_time = {0, 0, 0};
-
     i2c_init();
-    ds3231_setTime(init_time);
 }
 
 #endif /* DS3231_h */
