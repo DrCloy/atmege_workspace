@@ -2,7 +2,7 @@
 #include <avr/iom128.h>
 #include <avr/interrupt.h>
 #include "ds3231.h"
-#include "fnd_timer.h"
+#include "fnd_clock.h"
 #include "led.h"
 
 rtc_t testTime = {0, 5, 14};
