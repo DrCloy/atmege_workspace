@@ -25,9 +25,9 @@
 
 typedef struct
 {
-	uint8_t sec;
-	uint8_t min;
-	uint8_t hour;
+	int8_t sec;
+	int8_t min;
+	int8_t hour;
 } rtc_t;
 
 
