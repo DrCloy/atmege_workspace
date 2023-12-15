@@ -7,5 +7,6 @@
 void fnd_init();
 void fnd_print_function(int index);
 void fnd_print_time();
+void fnd_print_setting_time(rtc_t setting_time, int hour_min);
 
 #endif
