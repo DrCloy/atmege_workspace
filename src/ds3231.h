@@ -51,7 +51,7 @@ void ds3231_setTime(rtc_t realTime){
     i2c_start();
     i2c_write(DS3231_ADDRESS_W);
     i2c_write(0x00);    //move pointer location 0 which is seconds
-    i2c_write(decimalToBcd(realTime.sec));
+    i2c_write(decimalToBcd(0)); // second will always be set 0 because second cannot be printed in fnd
     i2c_write(decimalToBcd(realTime.min));
     i2c_write(decimalToBcd(realTime.hour));  // when bit 6 is low, 24 hour mode
     i2c_stop();
