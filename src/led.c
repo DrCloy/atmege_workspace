@@ -87,7 +87,7 @@ void led_init() {
     TCCR0 |= (1 << CS02) | (1 << CS01); // prescaler 256
     // Calculate OCR0 for 4ms
     // 2ms = ORC0 * (1 / (clk / prescaler))
-    // OCR0 = 2ms * (clk / prescaler) = 4ms * (16MHz / 256) = 125
+    // OCR0 = 2ms * (clk / prescaler) = 2ms * (16MHz / 256) = 125
     OCR0 = 125;
 
     // Set timer1 for make 3 PWM
