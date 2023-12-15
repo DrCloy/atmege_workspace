@@ -1,5 +1,5 @@
-#ifndef FND_TIMER_H
-#define FND_TIMER_H
+#ifndef FND_CLOCK_H
+#define FND_CLOCK_H
 
 #include <stdint.h>
 
