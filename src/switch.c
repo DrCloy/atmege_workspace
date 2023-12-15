@@ -6,14 +6,13 @@
 
 #include "switch.h"
 
-#define F_CPU 16000000UL
 
-#define SWITCH_GPIO_LEFT PE4
-#define SWITCH_GPIO_RIGHT PE5
+#define SWITCH_GPIO_UP PE5
+#define SWITCH_GPIO_DOWN PE4
 /** @brief Bouncing 방지를 위해 클릭 후 잠시 대기하는 시간(us)*/
-#define SWITCH_TIME_SHORT ((50) * (1000))
+#define SWITCH_TIME_SHORT ((50UL) * (1000UL))
 /** @brief 스위치 클릭 이벤트 발생 주기(us)*/
-#define SWITCH_TIME_LONG ((200) * (1000))
+#define SWITCH_TIME_LONG ((200UL) * (1000UL))
 
 enum switch_index {
     SWITCH_L = 0,
@@ -26,8 +25,8 @@ struct switch_t {
     uint32_t timer;
     unsigned int state;
 } _switch[SWITCH_COUNT] = {
-    { .gpio = SWITCH_GPIO_LEFT },
-    { .gpio = SWITCH_GPIO_RIGHT },
+    { .gpio = SWITCH_GPIO_UP },
+    { .gpio = SWITCH_GPIO_DOWN },
 };
 
 #define SWITCH_STATE_LONG_OFF   0x01    // 0001
@@ -74,7 +73,7 @@ static bool switch_state_machine(struct switch_t *psw) {
      * 그러므로 Long-On 상태에 있을 때 타이머를 하나 둔 후, 만약 그 타이머가 0 이하로 떨어질 경우 이벤트를 발생시키고 다시 타이머를 초기화하면 된다.
      */
 
-    bool clicked = !((PINE & (1 << (psw->gpio)) == 0x00));
+    bool clicked = (PINE & (1 << (psw->gpio))) == 0x00;
     bool click_event = false;
 
     switch (psw->state) {
@@ -134,6 +133,7 @@ void switch_init(void) {
     // persclaer = 1 -> OCR2 = 16 (CS2 = 001)
     TCCR2 |= (1 << WGM21) | (1 << CS20);
     OCR2 = 16;
+    TIMSK |= (1 << OCIE2);
 }
 
 static inline void switch_copy(struct switch_t *dest, struct switch_t *src) {

@@ -31,35 +31,28 @@ typedef struct
 } rtc_t;
 
 
+
 // Convert normal decimal numbers to binary coded decimal
-uint8_t decimalToBcd(uint8_t val){
+static inline uint8_t decimalToBcd(uint8_t val){
     return( (val/10*16) + (val%10) );
 }
 
 // Convert binary coded decimal to normal decimal numbers
-uint8_t bcdToDec(uint8_t val){
+static inline uint8_t bcdToDec(uint8_t val){
     return( (val/16*10) + (val%16) );
 }
 
-void ds3231_init() {
-    i2c_init();
-}
-
-void ds3231_setTime(rtc_t realTime){
-    
-    
+static inline void ds3231_setTime(rtc_t realTime){
     i2c_start();
     i2c_write(DS3231_ADDRESS_W);
     i2c_write(0x00);    //move pointer location 0 which is seconds
     i2c_write(decimalToBcd(0)); // second will always be set 0 because second cannot be printed in fnd
     i2c_write(decimalToBcd(realTime.min));
     i2c_write(decimalToBcd(realTime.hour));  // when bit 6 is low, 24 hour mode
-    i2c_stop();
-    
-    
+    i2c_stop();  
 }
 
-void ds3231_getTime(rtc_t* realTime){
+static inline void ds3231_getTime(rtc_t* realTime){
     
     i2c_start();
     i2c_write(DS3231_ADDRESS_W);
@@ -71,8 +64,14 @@ void ds3231_getTime(rtc_t* realTime){
     
     realTime->sec        = bcdToDec(i2c_read(1) & 0x7f);
     realTime->min        = bcdToDec(i2c_read(1));
-    realTime->hour       = bcdToDec(i2c_read(1) & 0x3f);
-    
+    realTime->hour       = bcdToDec(i2c_read(1) & 0x3f);   
+}
+
+static inline void ds3231_init() {
+    rtc_t init_time = {0, 0, 0};
+
+    i2c_init();
+    ds3231_setTime(init_time);
 }
 
 #endif /* DS3231_h */

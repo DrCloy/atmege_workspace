@@ -4,4 +4,4 @@
 void led_enable(int enabled);
 void led_init();
 
-#endif LED_H
+#endif

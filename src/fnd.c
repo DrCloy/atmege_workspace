@@ -1,11 +1,14 @@
+#define F_CPU 16000000UL
+
 #include <avr/io.h>
 #include <avr/iom128.h>
 #include <stdint.h>
 #include <util/delay.h>
-#include "ds3231.h"
-#include "switch.h"
 
-#define F_CPU 16000000UL
+
+#include "switch.h"
+#include "ds3231.h"
+
 #define FND_DIGIT        DDRC
 #define FND_DIGIT_DATA   PORTC
 #define FND_SELECT       DDRG
@@ -30,13 +33,13 @@ void fnd_print_function(int index) {
     uint8_t index_value[4];
     index_value[0] = 0x71; // F
     index_value[1] = 0x3e; // U
-    index_value[2] = (index / 10);
-    index_value[3] = (index % 10);
+    index_value[2] = fnd_number[(index / 10)];
+    index_value[3] = fnd_number[(index % 10)];
 
     for (int i = 0; i < 4; i++) {
-        FND_DIGIT_DATA = fnd_number[index_value[i]] | ((i == 1) ? FND_DP : 0);
+        FND_DIGIT_DATA = index_value[i] | ((i == 1) ? FND_DP : 0);
         FND_SELECT_DATA = 1 << (3 - i);
-        _delay_ms(20);
+        _delay_us(20);
     }
 }
 
@@ -54,7 +57,7 @@ void fnd_print_time() {
         for (int i = 0; i < 4; i++) {
             FND_DIGIT_DATA = fnd_number[fnd_value[i]] | ((i == 1) ? FND_DP : 0);
             FND_SELECT_DATA = 1 << (3 - i);
-            _delay_ms(20);
+            _delay_us(20);
         }
     }
 }

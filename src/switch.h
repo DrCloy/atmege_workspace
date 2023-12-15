@@ -25,12 +25,5 @@ enum switch_event_t switch_read(void);
  * 
  * @return enum switch_event_t 스위치의 눌림 이벤트 
 */
-inline static enum switch_event_t switch_wait_until_input(void) {
-    enum switch_event_t sw;
-
-    while (!(sw = switch_read())) {}
-
-    return sw;
-}
 
 #endif

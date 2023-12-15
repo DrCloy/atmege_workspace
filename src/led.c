@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <avr/interrupt.h>
 
-#define F_CPU 16000000UL
 // For RGB mode
 #define RGB_NONE 0
 #define RGB_R 1
