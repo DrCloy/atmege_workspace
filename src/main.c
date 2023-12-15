@@ -5,19 +5,28 @@
 #include "fnd_clock.h"
 #include "led.h"
 
-rtc_t testTime = {0, 5, 14};
+static const struct menu_t {
+  int index;
+  void (*func)(void);
+} menu[] = {
+  {0, },
+};
 
-int main() {
+rtc_t initTime = {0, 0, 0};
+
+void init() {
   ds3231_init();
   fnd_init();
-  ds3231_setTime(testTime);
+  ds3231_setTime(initTime);
   led_init();
   led_enable(1);
   sei();
-  
+}
+
+int main() {
   rtc_t currentTime;
   while (1) {
     ds3231_getTime(&currentTime);
-    fnd_print(currentTime.hour, currentTime.min);
+    fnd_print_time(currentTime.hour, currentTime.min);
   }
 }
