@@ -1,6 +1,6 @@
 #include <avr/io.h>
 #include <avr/iom128.h>
-#include <avr/delay.h>
+#include <avr/interrupt.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -34,6 +34,12 @@ struct switch_t {
 #define SWITCH_STATE_SHORT_ON   0x02    // 0010
 #define SWITCH_STATE_LONG_ON    0x04    // 0100
 #define SWITCH_STATE_SHORT_OFF  0x08    // 1000
+
+volatile static uint32_t time = 0;
+
+SIGNAL(TIMER2_COMP_vect) {
+    time += 1;
+}
 
 static bool switch_state_machine(struct switch_t *psw) {
     /*
@@ -70,7 +76,6 @@ static bool switch_state_machine(struct switch_t *psw) {
 
     bool clicked = !((PINE & (1 << (psw->gpio)) == 0x00));
     bool click_event = false;
-    uint16_t time = 0;
 
     switch (psw->state) {
         case SWITCH_STATE_LONG_OFF:
@@ -120,6 +125,15 @@ void switch_init(void) {
         state->timer = 0;
         state->state = SWITCH_STATE_LONG_OFF;
     }
+
+    // 스위치 상태 판별에 필요한 timer2 설정
+    // Mode : CTC Mode (WGM2 = 10)
+    // Period : 1us
+    // 1us = OCR2 * (1 / (clk / prescaler))
+    // OCR2 = 1us * (clk / prescaler) = 1us * (16MHz / prescaler) = 16 / prescaler
+    // persclaer = 1 -> OCR2 = 16 (CS2 = 001)
+    TCCR2 |= (1 << WGM21) | (1 << CS20);
+    OCR2 = 16;
 }
 
 static inline void switch_copy(struct switch_t *dest, struct switch_t *src) {
