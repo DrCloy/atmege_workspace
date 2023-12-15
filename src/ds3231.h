@@ -28,7 +28,7 @@ typedef struct
 	uint8_t sec;
 	uint8_t min;
 	uint8_t hour;
-}rtc_t;
+} rtc_t;
 
 
 // Convert normal decimal numbers to binary coded decimal
