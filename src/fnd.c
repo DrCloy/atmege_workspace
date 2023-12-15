@@ -24,7 +24,7 @@ void fnd_init() {
     FND_SELECT = ((1 << FND_SEL_0) | (1 << FND_SEL_1) | (1 << FND_SEL_2) | (1 << FND_SEL_3));
 }
 
-void fnd_print(uint8_t hour, uint8_t min) {
+void fnd_print_time(uint8_t hour, uint8_t min) {
     uint8_t fnd_value[4];
     fnd_value[0] = hour / 10;
     fnd_value[1] = hour % 10;
