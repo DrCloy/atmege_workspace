@@ -4,6 +4,8 @@
 #define SETTING_HOUR 0
 #define SETTING_MIN 1
 
+#include "ds3231.h"
+
 void fnd_init();
 void fnd_print_function(int index);
 void fnd_print_time();
