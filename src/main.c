@@ -7,22 +7,6 @@
 #include "switch.h"
 #include "led.h"
 
-static const struct menu_t {
-	int index;
-	void (*func)(void);
-} menu[] = {
-	{0, fnd_print_time},
-};
-
-void init() {
-	ds3231_init();
-	fnd_init();
-	switch_init();
-	led_init();
-	led_enable(1);
-	sei();
-}
-
 void set_time() {
 	rtc_t settime_time = {0, 0, 0};
 	int setting = 0;
@@ -38,10 +22,50 @@ void set_time() {
 		} else if (sw == SWITCH_EVENT_UP) {
 			if (setting == SETTING_HOUR) {
 				settime_time.hour += 1;
+				if (settime_time.hour > 23) {
+					settime_time.hour = 0;
+				}
+			} else if (setting == SETTING_MIN) {
+				settime_time.min += 1;
+				if (settime_time.min > 59) {
+					settime_time.min = 0;
+				}
+			}
+		} else if (sw == SWITCH_EVENT_DOWN) {
+			if (setting == SETTING_HOUR) {
+				settime_time.hour -= 1;
+				if (settime_time.hour < 0) {
+					settime_time.hour = 24;
+				}
+			} else if (setting == SETTING_MIN) {
+				settime_time.min -= 1;
+				if (settime_time.min < 0) {
+					settime_time.min = 59;
+				}
 			}
 		}
+		fnd_print_setting_time(settime_time, setting);
 	}
+	ds3231_setTime(settime_time);
 }
+
+static const struct menu_t {
+	int index;
+	void (*func)(void);
+} menu[] = {
+	{0, fnd_print_time},
+	{1, set_time},
+};
+
+void init() {
+	ds3231_init();
+	fnd_init();
+	switch_init();
+	led_init();
+	led_enable(1);
+	sei();
+}
+
 
 int main() {
 	// const uint8_t menu_index_max = sizeof(menu) / sizeof(struct menu_t) - 1;
