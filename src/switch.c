@@ -37,6 +37,7 @@ struct switch_t {
 volatile static uint32_t time = 0;
 
 SIGNAL(TIMER2_COMP_vect) {
+    // 1us timer
     time += 1;
 }
 
