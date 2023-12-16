@@ -6,7 +6,6 @@
 #include <util/delay.h>
 
 #include "fnd.h"
-#include "switch.h"
 #include "ds3231.h"
 
 #define FND_DIGIT        DDRC
@@ -68,8 +67,6 @@ void fnd_print_setting_time(rtc_t setting_time, int hour_min) {
     fnd_value[1] = fnd_number[setting_time.hour % 10];
     fnd_value[2] = fnd_number[setting_time.min / 10];
     fnd_value[3] = fnd_number[setting_time.min % 10];
-
-    // fnd_print(fnd_value, 1);
 
     if (hour_min == SETTING_HOUR) {
         fnd_value[2] = 0x00;
