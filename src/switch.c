@@ -11,9 +11,9 @@
 #define SWITCH_GPIO_DOWN PE5
 
 /** @brief Bouncing 방지를 위해 클릭 후 잠시 대기하는 시간(ms)*/
-#define SWITCH_TIME_SHORT 200UL
+#define SWITCH_TIME_SHORT 50UL
 /** @brief 스위치 클릭 이벤트 발생 주기(ms)*/
-#define SWITCH_TIME_LONG 500UL
+#define SWITCH_TIME_LONG 200UL
 
 enum switch_index {
     SWITCH_U = 0,
