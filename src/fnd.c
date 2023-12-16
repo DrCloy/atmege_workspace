@@ -83,3 +83,13 @@ void fnd_print_setting_time(rtc_t setting_time, int hour_min) {
         fnd_print(fnd_value, 1);
     }
 }
+
+void fnd_print_cds_threshold(uint16_t cds_threshold) {
+    uint8_t fnd_value[4];
+    fnd_value[0] = fnd_number[cds_threshold / 1000];
+    fnd_value[1] = fnd_number[(cds_threshold / 100) % 10];
+    fnd_value[2] = fnd_number[(cds_threshold / 10) % 10];
+    fnd_value[3] = fnd_number[cds_threshold % 10];
+
+    fnd_print(fnd_value, -1);
+}
