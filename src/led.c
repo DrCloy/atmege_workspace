@@ -70,7 +70,9 @@ SIGNAL(TIMER0_COMP_vect) {
 void led_enable(int enabled) {
     if (enabled) {
         TIMSK |= (1 << OCIE0); // enable timer0 compare match interrupt
-        OCR1A = 0xff;
+        red = 0xff;
+        green = 0x00;
+        blue = 0x00;
         rgb_mode = RGB_R;
     } else {
         TIMSK &= ~(1 << OCIE0); // disable timer0 compare match interrupt
