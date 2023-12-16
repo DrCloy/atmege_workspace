@@ -1,18 +1,24 @@
 #include <avr/io.h>
 #include <avr/iom128.h>
 #include <avr/interrupt.h>
+#include <stdbool.h>
 
 #include "fnd.h"
 #include "ds3231.h"
 #include "switch.h"
 #include "led.h"
+#include "cds.h"
+
+bool is_led_enable = false;
+uint16_t cds_threshold = 5;
 
 void set_time() {
 	rtc_t settime_time = {0, 0, 0};
 	int setting = 0;
+	int sw;
 
 	while(1) {
-		int sw = switch_read();
+		sw = switch_read();
 
 		if (sw == SWITCH_EVENT_BOTH) {
 			setting += 1;
@@ -49,12 +55,36 @@ void set_time() {
 	ds3231_setTime(settime_time);
 }
 
+void set_cds_threshold() {
+	int sw;
+
+	while(1) {
+		sw = switch_read();
+
+		if (sw == SWITCH_EVENT_BOTH) {
+			break;
+		} else if (sw == SWITCH_EVENT_UP) {
+			cds_threshold += 1;
+		} else if (sw == SWITCH_EVENT_DOWN) {
+			cds_threshold -= 1;
+		}
+
+		if (cds_state(cds_threshold) != is_led_enable) {
+			is_led_enable = !(is_led_enable);
+			led_enable(is_led_enable);
+		}
+
+		fnd_print_cds_threshold(cds_threshold);
+	}
+}
+
 static const struct menu_t {
 	int index;
 	void (*func)(void);
 } menu[] = {
 	{0, fnd_print_time},
 	{1, set_time},
+	{2, set_cds_threshold},
 };
 
 void init() {
@@ -62,7 +92,8 @@ void init() {
 	fnd_init();
 	switch_init();
 	led_init();
-	led_enable(1);
+	led_enable(is_led_enable);
+	cds_init();
 	sei();
 }
 
@@ -74,6 +105,11 @@ int main() {
 	init();
 	while (1) {
         fnd_print_function(menu_index);
+
+		if (cds_state(cds_threshold) != is_led_enable) {
+			is_led_enable = !(is_led_enable);
+			led_enable(is_led_enable);
+		}
         
         enum switch_event_t sw = switch_read();
         if (sw == SWITCH_EVENT_BOTH)
