@@ -17,11 +17,20 @@
 #define FND_SEL_3        PG3
 #define FND_DP           PC7
 
+/**
+ * @brief FND 관련 초기화 함수
+*/
 void fnd_init() {
     FND_DIGIT = 0xff;
     FND_SELECT = ((1 << FND_SEL_0) | (1 << FND_SEL_1) | (1 << FND_SEL_2) | (1 << FND_SEL_3));
 }
 
+/**
+ * @brief 입력된 값을 0 ~ 9, A ~ Z, a ~ z 중 하나로 판단하고, FND의 출력 형태로 바꿔주는 함수
+ * 
+ * @param value 숫자 0 ~ 9, 문자 'A' ~ 'Z', 'a' ~ 'z' 중 하나
+ * @return FND 출력 형식에 맞도록 변형된 PORTC 레지스터에 입력될 값 
+*/
 uint8_t fnd_get_value(uint8_t value) {
     if (value >= 0 && value <= 9) {
         return fnd_value[value];
@@ -34,6 +43,12 @@ uint8_t fnd_get_value(uint8_t value) {
     }
 }
 
+/**
+ * @brief FND에 값을 출력하는 함수
+ * 
+ * @param value PORTC의 값으로 사용될 값이 들어있는 Array
+ * @param dp_index FND의 Digit Point를 찍을 위치, 없으면 -1
+*/
 void fnd_write(uint8_t *value, int dp_index) {
     for (int i = 0; i < 4; i++) {
         FND_DIGIT_DATA = value[i] | ((i == dp_index) ? (1 << FND_DP) : 0);
@@ -42,6 +57,12 @@ void fnd_write(uint8_t *value, int dp_index) {
     }
 }
 
+/**
+ * @brief 외부에서 FND에게 값을 출력하도록 요청하는 함수
+ * 
+ * @param value FND에 출력될 문자가 담긴 Array
+ * @param dp_index FND의 Digit Point를 찍을 위치, 없으면 -1
+*/
 void fnd_print(uint8_t *value, int dp_index) {
     uint8_t fnd_value[4];
     for (int i = 0; i < 4; i++) {

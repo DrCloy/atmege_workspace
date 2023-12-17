@@ -7,6 +7,9 @@
 volatile int cds_is_sensed;
 volatile uint16_t cds_threshold;
 
+/**
+ * @brief Cds 관련 레지스터 초기화 함수
+*/
 void cds_init() {
     /** ADC Mux Select */
     // Voltage Reference = 5V (REFS = '00')
@@ -23,6 +26,11 @@ void cds_init() {
     cds_threshold = 5;
 }
 
+/**
+ * @brief ADC애서 Cds 값을 읽어오는 함수 
+ * 
+ * @return ADC에서 읽은 10bit 데이터 
+*/
 uint16_t cds_read() {
     uint8_t adc_low, adc_high;
     uint16_t value;
@@ -40,6 +48,12 @@ uint16_t cds_read() {
     return value;
 }
 
+/**
+ * @brief ADC애서 읽어온 값을 통해 Cds의 저항값을 구하는 함수
+ * 
+ * @param adc_value 10bit의 ADC 값
+ * @return Cds의 현재 저항 값
+*/
 float cds_convert(uint16_t adc_value) {
     // Get Voltage of CDS
     // ADC Voltage (= 200K Register Voltage) = ADC Value / 1024 * 5
@@ -55,6 +69,9 @@ float cds_convert(uint16_t adc_value) {
     return cds_register;
 }
 
+/**
+ * @brief Cds의 저항값을 통해 현재 밝은 상태인지 어두운 상태인지 확인하는 함수 
+*/
 void cds_sense() {
     float cds_register = cds_convert(cds_read());
 

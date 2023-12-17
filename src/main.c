@@ -9,6 +9,7 @@
 #include "switch.h"
 #include "timer.h"
 
+// Menu 0 - 현재 시각 출력
 void print_time() {
 	rtc_t current_time;
 
@@ -25,7 +26,7 @@ void print_time() {
 	}
 }
 
-
+// Menu 1 - 현재 시각 설정
 void set_time() {
 	rtc_t setting_time = {0, 0, 0};
 	uint8_t fnd_value[4];
@@ -76,6 +77,7 @@ void set_time() {
 	ds3231_setTime(setting_time);
 }
 
+// Menu 2 - Cds 임계값 설정 
 void set_cds_threshold() {
 	int sw;
 	uint8_t fnd_value[4];
@@ -100,6 +102,7 @@ void set_cds_threshold() {
 	}
 }
 
+// Menu 3 - LEN On/Off 설정
 void set_led_onoff() {
 	int sw;
 	uint8_t fnd_value[4];
@@ -128,6 +131,7 @@ void set_led_onoff() {
 	}
 }
 
+// Menu 4 - 주변의 빛에 따라 LED 자동 On/Off 기능 설정 
 void set_led_auto() {
 	int sw;
 	uint8_t fnd_value[4];
@@ -156,16 +160,18 @@ void set_led_auto() {
 	}
 }
 
+// 기본 화면에서 메뉴 번호 출력
 void print_menu(int menu_index) {
 	uint8_t fnd_value[4];
 	fnd_value[0] = 'F';
-	fnd_value[1] = 'U';
+	fnd_value[1] = 'N';
 	fnd_value[2] = menu_index / 10;
 	fnd_value[3] = menu_index % 10;
 
 	fnd_print(fnd_value, 1);
 }
 
+// 기능들의 모음
 static const struct menu_t {
 	int index;
 	void (*func)(void);
@@ -177,6 +183,7 @@ static const struct menu_t {
 	{4, set_led_auto},
 };
 
+// 전체 초기화
 void init() {
 	timer_init();
 	ds3231_init();
@@ -188,13 +195,15 @@ void init() {
 	sei();
 }
 
-
+// Main
 int main() {
 	const uint8_t menu_index_max = sizeof(menu) / sizeof(struct menu_t) - 1;
 	int menu_index = 0;
 	enum switch_event_t sw;
 
 	init();
+	
+	// Loop
 	while (1) {
         print_menu(menu_index);
         

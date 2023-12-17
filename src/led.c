@@ -76,6 +76,11 @@ void led_state_machine() {
     led_set_color();
 }
 
+/**
+ * @brief LED를 켜고 끄는 함수
+ * 
+ * @param enabled 1이면 LED 켬, 0이면 LED 끔
+*/
 void led_enable(int enabled) {
     if (enabled) {
         red = 0xff;
@@ -93,6 +98,9 @@ void led_enable(int enabled) {
     }
 }
 
+/**
+ * @brief LED 관련 초기화 함수
+*/
 void led_init() {
     // Set PB5, PB6, PB7 as PWM output
     DDRB |= (1 << PB5) | (1<< PB6) | (1 << PB7);
