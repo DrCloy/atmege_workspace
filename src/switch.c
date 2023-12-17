@@ -2,7 +2,6 @@
 #include <avr/iom128.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
-#include <stdbool.h>
 
 #include "timer.h"
 #include "switch.h"
@@ -37,7 +36,7 @@ struct switch_t {
 #define SWITCH_STATE_SHORT_OFF  0x08    // 1000
 
 
-static bool switch_state_machine(struct switch_t *psw) {
+static int switch_state_machine(struct switch_t *psw) {
     /*
      * 스위치가 눌리거나 떼질 때, 그 값이 한 번에 깔끔하게 변하지 않고 아주 짧은 시간동안 On, Off를 수십~수백번 반복한다.
      * 이를 Bouncing 혹은 Chattering이라 한다. Bouncing의 특징은 일반적인 노이즈와 다르게
@@ -70,8 +69,8 @@ static bool switch_state_machine(struct switch_t *psw) {
      * 그러므로 Long-On 상태에 있을 때 타이머를 하나 둔 후, 만약 그 타이머가 0 이하로 떨어질 경우 이벤트를 발생시키고 다시 타이머를 초기화하면 된다.
      */
 
-    bool clicked = (PINE & (1 << (psw->gpio))) == 0x00;
-    bool click_event = false;
+    int clicked = (PINE & (1 << (psw->gpio))) == 0x00;
+    int click_event = 0;
     uint32_t time = timer0_counter;
 
     switch (psw->state) {
@@ -84,7 +83,7 @@ static bool switch_state_machine(struct switch_t *psw) {
         
         case SWITCH_STATE_SHORT_ON:
             if (psw->timer < time) {
-                click_event = true;
+                click_event = 1;
                 psw->timer = time + SWITCH_TIME_LONG;
                 psw->state = SWITCH_STATE_LONG_ON;
             }
@@ -98,7 +97,7 @@ static bool switch_state_machine(struct switch_t *psw) {
             }
 
             if (psw->timer < time) {
-                click_event = true;
+                click_event = 1;
                 psw->timer = time + SWITCH_TIME_LONG;
             }
             break;
@@ -133,8 +132,8 @@ enum switch_event_t switch_read(void) {
     /*
     * 스위치의 눌림 여부를 결정한다
     */
-    bool clicked_u = switch_state_machine(&_switch[SWITCH_U]);
-    bool clicked_d = switch_state_machine(&_switch[SWITCH_D]);
+    int clicked_u = switch_state_machine(&_switch[SWITCH_U]);
+    int clicked_d = switch_state_machine(&_switch[SWITCH_D]);
 
     /*
     * 다음으로 버튼이 두 개인 경우를 고려하자.
@@ -145,11 +144,11 @@ enum switch_event_t switch_read(void) {
     */
     if (clicked_u && (_switch[SWITCH_D].state & SWITCH_STATE_SHORT_ON)) {
         switch_copy(&_switch[SWITCH_D], &_switch[SWITCH_U]);
-        clicked_d = true;
+        clicked_d = 1;
     }
     if (clicked_d && (_switch[SWITCH_U].state & SWITCH_STATE_SHORT_ON)) {
         switch_copy(&_switch[SWITCH_U], &_switch[SWITCH_D]);
-        clicked_d = true;
+        clicked_d = 1;
     }
 
     enum switch_event_t ret = 0;

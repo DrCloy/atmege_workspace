@@ -1,7 +1,9 @@
 #include <avr/io.h>
 #include <avr/iom128.h>
-#include <stdint.h>
 #include <avr/interrupt.h>
+#include <stdint.h>
+
+#include "led.h"
 
 // For RGB mode
 #define RGB_NONE 0
@@ -9,6 +11,9 @@
 #define RGB_G 2
 #define RGB_B 4
 
+volatile int led_onoff;
+volatile int led_auto;
+volatile int led_is_enable;
 volatile static uint8_t timer_counter = 0;
 volatile static uint8_t red = 0xff;
 volatile static uint8_t green = 0x00;
@@ -91,4 +96,7 @@ void led_enable(int enabled) {
 void led_init() {
     // Set PB5, PB6, PB7 as PWM output
     DDRB |= (1 << PB5) | (1<< PB6) | (1 << PB7);
+
+    led_onoff = 1;
+    led_auto = 0;
 }

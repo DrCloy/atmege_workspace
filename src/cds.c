@@ -1,7 +1,11 @@
 #include <avr/io.h>
 #include <avr/iom128.h>
 #include <stdint.h>
-#include <stdbool.h>
+
+#include "cds.h"
+
+volatile int cds_is_sensed;
+volatile uint16_t cds_threshold;
 
 void cds_init() {
     /** ADC Mux Select */
@@ -15,6 +19,8 @@ void cds_init() {
     // Mode = Single conversion (ADFR = '0')
     // Prescaler = 32 (ADPS = '101')
     ADCSRA |= (1 << ADPS0) | (1 << ADPS2);
+
+    cds_threshold = 5;
 }
 
 uint16_t cds_read() {
@@ -49,8 +55,8 @@ float cds_convert(uint16_t adc_value) {
     return cds_register;
 }
 
-bool cds_state(uint16_t threshold) {
+void cds_sense() {
     float cds_register = cds_convert(cds_read());
 
-    return (cds_register > threshold);
+    cds_is_sensed = (cds_register > cds_threshold) ? 1 : 0;
 }

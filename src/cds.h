@@ -2,9 +2,11 @@
 #define CDS_H
 
 #include <stdint.h>
-#include <stdbool.h>
+
+extern volatile int cds_is_sensed;
+extern volatile uint16_t cds_threshold;
 
 void cds_init();
-bool cds_state(uint16_t threshold);
+void cds_sense();
 
 #endif

@@ -3,19 +3,33 @@
 #include <avr/iom128.h>
 #include <avr/interrupt.h>
 #include <stdint.h>
+
 #include "timer.h"
 
 /* Timer Interrupt에서 실행될 Method들이 있는 Module*/
 #include "led.h"
-// #include "switch.h"
+#include "cds.h"
 
-volatile uint32_t timer0_counter = 0;
+// 1ms마다 1씩 증가하는 counter
+// overflow는 약 49.7일에 한번씩 일어난다.
+volatile uint32_t timer0_counter;
 
 // Timer0 Interrupt Service Routine
 ISR(TIMER0_COMP_vect) {
     timer0_counter += 1;
+    // For each 50ms
     if (timer0_counter % 50 == 0) {
         led_state_machine();
+    }
+
+    // For each 100ms
+    if (timer0_counter % 100 == 0) {
+        cds_sense();
+        int led_current_state = led_onoff & ((!led_auto) | (led_auto & cds_is_sensed));
+        if (led_current_state != led_is_enable) {
+            led_is_enable = led_onoff & ((!led_auto) | (led_auto & cds_is_sensed));
+            led_enable(led_is_enable);
+        }
     }
 }
 
