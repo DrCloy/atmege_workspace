@@ -61,7 +61,7 @@ void timer1_init() {
 /**
  * @brief Timer2 초기화 함수
 */
-void timer0_init() {
+void timer2_init() {
     /**
      * Timer2이 1ms의 주기로 Timer Interrupt를 발생한다
      * Timer2의 Timer Interrupt에서는 timer0_counter의 값을 1 증가시키고,
@@ -73,7 +73,7 @@ void timer0_init() {
     // Mode : CTC Mode (WGM2 = 10)
     // Compare Output 사용 안 함 (COM2 = 00)
     // Prescaler = 64 (CS2 = 011)
-    TCCR0 |= (1 << WGM21) | (1 << CS21) | (1 << CS20);
+    TCCR2 |= (1 << WGM21) | (1 << CS21) | (1 << CS20);
 
     // 2. OCR2
     // 주기 : 1ms
