@@ -128,6 +128,34 @@ void set_led_onoff() {
 	}
 }
 
+void set_led_auto() {
+	int sw;
+	uint8_t fnd_value[4];
+
+	while(1) {
+		sw = switch_read();
+
+		if (sw == SWITCH_EVENT_BOTH) {
+			break;
+		} else if ((sw == SWITCH_EVENT_UP) || (sw == SWITCH_EVENT_DOWN)) {
+			led_auto = !(led_auto);
+		}
+
+		fnd_value[0] = 'z' + 1;
+		if (led_auto) {
+			fnd_value[1] = 'z' + 1;
+			fnd_value[2] = 'O';
+			fnd_value[3] = 'N';
+		} else {
+			fnd_value[1] = 'O';
+			fnd_value[2] = 'F';
+			fnd_value[3] = 'F';
+		}
+
+		fnd_print(fnd_value, -1);
+	}
+}
+
 void print_menu(int menu_index) {
 	uint8_t fnd_value[4];
 	fnd_value[0] = 'F';
@@ -146,6 +174,7 @@ static const struct menu_t {
 	{1, set_time},
 	{2, set_cds_threshold},
 	{3, set_led_onoff},
+	{4, set_led_auto},
 };
 
 void init() {
