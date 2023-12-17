@@ -34,6 +34,24 @@ ISR(TIMER2_COMP_vect) {
 }
 
 /**
+ * @brief Timer0 초기화 함수
+*/
+void timer0_init() {
+    /**
+     * Timer0은 특정 주파수에 맞게 부저를 울리기 위해, Square Wave를 생성하는 timer이다
+     * buzzer.c에서 구해진 음의 주파수에 맞게 prescaler와 OCR0이 정해지면
+     * PB4에 Square Wave가 출력된다
+    */
+
+    // Timer0 레지스터 설정
+    // 1. TCCR0
+    // Mode : CTC Mode (WGM0 = 10)
+    // Compare Output Mode : Toggle (COM0 = 01)
+    // Prescaler는 buzzer.c에서 조절
+    TCCR0 |= (1 << WGM01) | (1 << COM00); 
+}
+
+/**
  * @brief Timer1 초기화 함수
 */
 void timer1_init() {
@@ -90,6 +108,7 @@ void timer2_init() {
  * @brief 사용하는 모든 Timer를 초기화하는 함수
 */
 void timer_init() {
+    timer0_init();
     timer1_init();
     timer2_init();
 }
