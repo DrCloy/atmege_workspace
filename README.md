@@ -6,6 +6,10 @@ Atmega128를 사용하여 임베디드 시스템 구현하기
 - 이름 : 김민교
 - 과목 : 마이크로프로세서설계및실습
 
+## Environment
+### Operating System
+- 
+
 ## Manual
 ### Upload Manual
 - In Window Command Prompt (or Powershell)
@@ -36,4 +40,4 @@ usbipd wsl attach -b <BUS ID of Atmega board>
     - timer0가 2ms 주기마다 인터럽트를 발생시키고, timer2가 1us 주기마다 인터럽트를 발생시키게 했을 때, timer0의 인터럽트가 발생되지 않았음
     - 이는 timer2의 인터럽트가 timer0에 비해 너무 짧은 주기로 실행되어서 timer0의 인터럽트가 발생했을 때는 이미 timer2의 인터럽트가 발생되고 있는 상태여서 timer0의 인터럽트가 무시되지 않았나 싶음
     - 알고리즘 상 1us 까지의 정확도는 필요 없고, 1ms 정도의 정확도로도 충분할 것으로 생각되어 timer2의 주기를 1us에서 1ms로 변경하여 해결
-    
+    - 이후 timer의 부족으로 timer0과 timer2의 인터럽트가 하던 일을 하나의 타이머(timer2)의 인터럽트가 하도록 변경
