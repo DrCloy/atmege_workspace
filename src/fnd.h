@@ -1,16 +1,24 @@
 #ifndef FND_H
 #define FND_H
 
-#define SETTING_HOUR 0
-#define SETTING_MIN 1
-
 #include <stdint.h>
 #include "ds3231.h"
 
+#define SETTING_HOUR 0
+#define SETTING_MIN 1
+
+/**
+ * @brief 0 ~ 9, A ~ Z까지를 FND에 표현하기 위한 PORTC의 값, 0x00인 경우에는 FND로 표현 불가능
+*/
+volatile static uint8_t fnd_value[] = {
+    0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f,
+    0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x7d, 0x76, 0x30, 0x0f,
+    0x00, 0x38, 0x00, 0x54, 0x3f, 0x73, 0x67, 0x50, 0x6d, 0x78,
+    0x3e, 0x1c, 0x00, 0x00, 0x66, 0x5b
+};
+
+
 void fnd_init();
-void fnd_print_function(int index);
-void fnd_print_time();
-void fnd_print_setting_time(rtc_t setting_time, int hour_min);
-void fnd_print_cds_threshold(uint16_t cds_threshold);
+void fnd_print(uint8_t *value, int dp_index);
 
 #endif

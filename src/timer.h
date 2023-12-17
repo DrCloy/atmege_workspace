@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-volatile uint32_t timer0_counter;
+extern volatile uint32_t timer0_counter;
 
 void timer_init();
 
