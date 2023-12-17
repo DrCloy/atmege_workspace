@@ -8,6 +8,7 @@
 #include "ds3231.h"
 #include "switch.h"
 #include "timer.h"
+#include "buzzer.h"
 
 // Menu 0 - 현재 시각 출력
 void print_time() {
@@ -17,10 +18,10 @@ void print_time() {
 		ds3231_getTime(&current_time);
 
 		uint8_t fnd_value[4];
-		fnd_value[0] = current_time.hour / 10;
-		fnd_value[1] = current_time.hour % 10;
-		fnd_value[2] = current_time.min / 10;
-		fnd_value[3] = current_time.min % 10;
+		fnd_value[0] = '0' + (current_time.hour / 10);
+		fnd_value[1] = '0' + (current_time.hour % 10);
+		fnd_value[2] = '0' + (current_time.min / 10);
+		fnd_value[3] = '0' + (current_time.min % 10);
 
 		fnd_print(fnd_value, 1);
 	}
@@ -67,10 +68,10 @@ void set_time() {
 			}
 		}
 
-		fnd_value[0] = (setting_time.hour / 10) & (setting == SETTING_HOUR);
-		fnd_value[1] = (setting_time.hour % 10) & (setting == SETTING_HOUR);
-		fnd_value[2] = (setting_time.min / 10) & (setting == SETTING_MIN);
-		fnd_value[3] = (setting_time.min % 10) & (setting == SETTING_MIN);
+		fnd_value[0] = ('0' + (setting_time.hour / 10)) * (setting == SETTING_HOUR);
+		fnd_value[1] = ('0' + (setting_time.hour % 10)) * (setting == SETTING_HOUR);
+		fnd_value[2] = ('0' + (setting_time.min / 10)) * (setting == SETTING_MIN);
+		fnd_value[3] = ('0' + (setting_time.min % 10)) * (setting == SETTING_MIN);
 
 		fnd_print(fnd_value, 1);
 	}
@@ -93,12 +94,12 @@ void set_cds_threshold() {
 			cds_threshold -= 1;
 		}
 
-		fnd_value[0] = cds_threshold / 1000;
-		fnd_value[1] = (cds_threshold / 100) % 10;
-		fnd_value[2] = (cds_threshold / 10) % 10;
-		fnd_value[3] = cds_threshold % 10;
+		fnd_value[0] = '0' + (cds_threshold / 1000);
+		fnd_value[1] = '0' + ((cds_threshold / 100) % 10);
+		fnd_value[2] = '0' + ((cds_threshold / 10) % 10);
+		fnd_value[3] = '0' + (cds_threshold % 10);
 
-		fnd_print(fnd_value, 1);
+		fnd_print(fnd_value, -1);
 	}
 }
 
@@ -116,9 +117,9 @@ void set_led_onoff() {
 			led_onoff = !(led_onoff);
 		}
 
-		fnd_value[0] = 'z' + 1;
+		fnd_value[0] = 0;
 		if (led_onoff) {
-			fnd_value[1] = 'z' + 1;
+			fnd_value[1] = 0;
 			fnd_value[2] = 'O';
 			fnd_value[3] = 'N';
 		} else {
@@ -145,9 +146,9 @@ void set_led_auto() {
 			led_auto = !(led_auto);
 		}
 
-		fnd_value[0] = 'z' + 1;
+		fnd_value[0] = 0;
 		if (led_auto) {
-			fnd_value[1] = 'z' + 1;
+			fnd_value[1] = 0;
 			fnd_value[2] = 'O';
 			fnd_value[3] = 'N';
 		} else {
@@ -160,13 +161,51 @@ void set_led_auto() {
 	}
 }
 
+void set_buzzer() {
+	int sw;
+	int buzzer_value = -1;
+	uint8_t fnd_value[4];
+
+	buzzer_is_on = 1;
+
+	while(1) {
+		sw = switch_read();
+
+		if (sw == SWITCH_EVENT_BOTH) {
+			break;
+		} else if (sw == SWITCH_EVENT_UP) {
+			buzzer_value++;		
+			buzzer_make_sound(buzzer_value);
+		} else if (sw == SWITCH_EVENT_DOWN) {
+			buzzer_value--;		
+			buzzer_make_sound(buzzer_value);
+		}
+
+		if (buzzer_value < 0) {
+			fnd_value[0] = 'N';
+			fnd_value[1] = 'O';
+			fnd_value[2] = 'N';
+			fnd_value[3] = 'E';
+		} else {
+			fnd_value[0] = 0;
+			fnd_value[1] = 0;
+			fnd_value[2] = buzzer_scale[buzzer_value % 7];
+			fnd_value[3] = '0' + (buzzer_value / 7);
+		}
+
+		fnd_print(fnd_value, -1);
+	}
+	buzzer_is_on = 0;
+	buzzer_make_sound(buzzer_value);
+}
+
 // 기본 화면에서 메뉴 번호 출력
 void print_menu(int menu_index) {
 	uint8_t fnd_value[4];
 	fnd_value[0] = 'F';
 	fnd_value[1] = 'N';
-	fnd_value[2] = menu_index / 10;
-	fnd_value[3] = menu_index % 10;
+	fnd_value[2] = '0' + (menu_index / 10);
+	fnd_value[3] = '0' + (menu_index % 10);
 
 	fnd_print(fnd_value, 1);
 }
@@ -181,6 +220,7 @@ static const struct menu_t {
 	{2, set_cds_threshold},
 	{3, set_led_onoff},
 	{4, set_led_auto},
+	{5, set_buzzer},
 };
 
 // 전체 초기화
@@ -192,6 +232,7 @@ void init() {
 	led_init();
 	led_enable(1);
 	cds_init();
+	buzzer_init();
 	sei();
 }
 

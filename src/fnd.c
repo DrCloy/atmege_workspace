@@ -28,12 +28,12 @@ void fnd_init() {
 /**
  * @brief 입력된 값을 0 ~ 9, A ~ Z, a ~ z 중 하나로 판단하고, FND의 출력 형태로 바꿔주는 함수
  * 
- * @param value 숫자 0 ~ 9, 문자 'A' ~ 'Z', 'a' ~ 'z' 중 하나
+ * @param value 문자 0 ~ 9, 'A' ~ 'Z', 'a' ~ 'z' 중 하나
  * @return FND 출력 형식에 맞도록 변형된 PORTC 레지스터에 입력될 값 
 */
 uint8_t fnd_get_value(uint8_t value) {
-    if (value >= 0 && value <= 9) {
-        return fnd_value[value];
+    if (value >= '0' && value <= '9') {
+        return fnd_value[value - '0'];
     } else if (value >= 'A' && value <= 'Z') {
         return fnd_value[value - 'A' + 10];
     } else if (value >= 'a' && value <= 'z') {
