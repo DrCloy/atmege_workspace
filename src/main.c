@@ -3,6 +3,7 @@
 #include <avr/interrupt.h>
 #include <stdbool.h>
 
+#include "timer.h"
 #include "fnd.h"
 #include "ds3231.h"
 #include "switch.h"
@@ -88,12 +89,13 @@ static const struct menu_t {
 };
 
 void init() {
+	timer_init();
 	ds3231_init();
 	fnd_init();
 	switch_init();
 	led_init();
-	led_enable(is_led_enable);
-	cds_init();
+	led_enable(true);
+	// cds_init();
 	sei();
 }
 
@@ -101,17 +103,18 @@ void init() {
 int main() {
 	const uint8_t menu_index_max = sizeof(menu) / sizeof(struct menu_t) - 1;
 	int menu_index = 0;
+	enum switch_event_t sw;
 
 	init();
 	while (1) {
         fnd_print_function(menu_index);
 
-		if (cds_state(cds_threshold) != is_led_enable) {
-			is_led_enable = !(is_led_enable);
-			led_enable(is_led_enable);
-		}
+		// if (cds_state(cds_threshold) != is_led_enable) {
+		// 	is_led_enable = !(is_led_enable);
+		// 	led_enable(is_led_enable);
+		// }
         
-        enum switch_event_t sw = switch_read();
+        sw = switch_read();
         if (sw == SWITCH_EVENT_BOTH)
             menu[menu_index].func();
         if (sw == SWITCH_EVENT_DOWN)

@@ -15,13 +15,20 @@ volatile static uint8_t green = 0x00;
 volatile static uint8_t blue = 0x00;
 volatile static uint8_t rgb_mode = RGB_R;
 
-SIGNAL(TIMER0_COMP_vect) {
-    // RGB 값을 50ms에 1씩 바꿔준다. 
-    timer_counter += 1;
-    if (timer_counter == 25) {
-        timer_counter = 0;
-        switch (rgb_mode)
-        {
+/**
+ * @brief led_state_machine에서 변경된 rgb 값을 각각의 PWM의 Duty Rate로 바꿔주는 Method
+*/
+void led_set_color() {
+    OCR1A = red;
+    OCR1B = green;
+    OCR1C = blue;
+}
+
+/**
+ * @brief 현재 상태에 따라 rgb값을 바꿔주는 State Machine
+*/
+void led_state_machine() {
+    switch (rgb_mode) {
         case RGB_R:
             green += 1;
             if (green == 0xff) {
@@ -60,22 +67,20 @@ SIGNAL(TIMER0_COMP_vect) {
             break;
         default:
             break;
-        }
-        OCR1A = red;
-        OCR1B = green;
-        OCR1C = blue;
     }
+    led_set_color();
 }
 
 void led_enable(int enabled) {
     if (enabled) {
-        TIMSK |= (1 << OCIE0); // enable timer0 compare match interrupt
         red = 0xff;
         green = 0x00;
         blue = 0x00;
         rgb_mode = RGB_R;
     } else {
-        TIMSK &= ~(1 << OCIE0); // disable timer0 compare match interrupt
+        red = 0x00;
+        green = 0x00;
+        blue = 0x00;
         OCR1A = 0x00;
         OCR1B = 0x00;
         OCR1C = 0x00;
@@ -84,25 +89,6 @@ void led_enable(int enabled) {
 }
 
 void led_init() {
-    // Set timer0 for adjust RGB value
-    TCCR0 |= (1 << WGM01); // CTC mode
-    TCCR0 |= (1 << CS02) | (1 << CS01); // prescaler 256
-    // Calculate OCR0 for 4ms
-    // 2ms = ORC0 * (1 / (clk / prescaler))
-    // OCR0 = 2ms * (clk / prescaler) = 2ms * (16MHz / 256) = 125
-    OCR0 = 125;
-
-    // Set timer1 for make 3 PWM
-    // Timer Mode : 8 bit fast PWM Mode (WGM1 = 0101)
-    // Clear OC1A, OC1B, OC1C on Compare Match, set at Bottom (non-intverting mode, COM1A = 10, COM1B = 10, COM1C = 10)
-    TCCR1A = (1 << COM1A1) | (1 << COM1B1) | (1 << COM1C1) | (1 << WGM10);
-    TCCR1B = (1 << WGM12) | (1 << CS10);
-
-    // Set initial duty ratio
-    OCR1A = 0;
-    OCR1B = 0;
-    OCR1C = 0;
-
     // Set PB5, PB6, PB7 as PWM output
     DDRB |= (1 << PB5) | (1<< PB6) | (1 << PB7);
 }
