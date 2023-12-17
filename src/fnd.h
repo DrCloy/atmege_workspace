@@ -2,7 +2,6 @@
 #define FND_H
 
 #include <stdint.h>
-#include "ds3231.h"
 
 #define SETTING_HOUR 0
 #define SETTING_MIN 1

@@ -12,18 +12,18 @@
 
 // 1ms마다 1씩 증가하는 counter
 // overflow는 약 49.7일에 한번씩 일어난다.
-volatile uint32_t timer0_counter;
+volatile uint32_t timer2_counter;
 
-// Timer0 Interrupt Service Routine
-ISR(TIMER0_COMP_vect) {
-    timer0_counter += 1;
+// Timer2 Interrupt Service Routine
+ISR(TIMER2_COMP_vect) {
+    timer2_counter += 1;
     // For each 50ms
-    if (timer0_counter % 50 == 0) {
+    if (timer2_counter % 50 == 0) {
         led_state_machine();
     }
 
     // For each 100ms
-    if (timer0_counter % 100 == 0) {
+    if (timer2_counter % 100 == 0) {
         cds_sense();
         int led_current_state = led_onoff & ((!led_auto) | (led_auto & cds_is_sensed));
         if (led_current_state != led_is_enable) {
@@ -31,34 +31,6 @@ ISR(TIMER0_COMP_vect) {
             led_enable(led_is_enable);
         }
     }
-}
-
-/**
- * @brief Timer0 초기화 함수
-*/
-void timer0_init() {
-    /**
-     * Timer0이 1ms의 주기로 Timer Interrupt를 발생한다
-     * Timer0의 Timer Interrupt에서는 timer0_counter의 값을 1 증가시키고,
-     * timer0_counter의 값에 따라 추가적인 기능을 수행해준다
-    */
-
-    // Timer0 레지스터 설정
-    // 1. TCCR0
-    // Mode : CTC Mode (WGM0 = 10)
-    // Compare Output 사용 안 함 (COM0 = 00)
-    // Prescaler = 64 (CS0 = 100)
-    TCCR0 |= (1 << WGM01) | (1 << CS02);
-
-    // 2. OCR0
-    // 주기 : 1ms
-    // 1ms = OCR0 * (1 / (clk / prescaler))
-    // OCR0 = 1ms * (clk / prescaler) = 1ms * (16MHz / 64) = 250
-    OCR0 = 250;
-
-    // 3. TIMSK
-    // Timer 0번 Output Compare Match Interrup Enable (OCIE0 = 1)
-    TIMSK |= (1 << OCIE0);
 }
 
 /**
@@ -87,9 +59,37 @@ void timer1_init() {
 }
 
 /**
+ * @brief Timer2 초기화 함수
+*/
+void timer0_init() {
+    /**
+     * Timer2이 1ms의 주기로 Timer Interrupt를 발생한다
+     * Timer2의 Timer Interrupt에서는 timer0_counter의 값을 1 증가시키고,
+     * timer2_counter의 값에 따라 추가적인 기능을 수행해준다
+    */
+
+    // Timer2 레지스터 설정
+    // 1. TCCR2
+    // Mode : CTC Mode (WGM2 = 10)
+    // Compare Output 사용 안 함 (COM2 = 00)
+    // Prescaler = 64 (CS2 = 011)
+    TCCR0 |= (1 << WGM21) | (1 << CS21) | (1 << CS20);
+
+    // 2. OCR2
+    // 주기 : 1ms
+    // 1ms = OCR2 * (1 / (clk / prescaler))
+    // OCR2 = 1ms * (clk / prescaler) = 1ms * (16MHz / 64) = 250
+    OCR2 = 250;
+
+    // 3. TIMSK
+    // Timer 2번 Output Compare Match Interrup Enable (OCIE2 = 1)
+    TIMSK |= (1 << OCIE2);
+}
+
+/**
  * @brief 사용하는 모든 Timer를 초기화하는 함수
 */
 void timer_init() {
-    timer0_init();
     timer1_init();
+    timer2_init();
 }

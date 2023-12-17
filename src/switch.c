@@ -71,7 +71,7 @@ static int switch_state_machine(struct switch_t *psw) {
 
     int clicked = (PINE & (1 << (psw->gpio))) == 0x00;
     int click_event = 0;
-    uint32_t time = timer0_counter;
+    uint32_t time = timer2_counter;
 
     switch (psw->state) {
         case SWITCH_STATE_LONG_OFF:
