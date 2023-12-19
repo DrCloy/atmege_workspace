@@ -20,10 +20,4 @@ void switch_init(void);
 */
 enum switch_event_t switch_read(void);
 
-/**
- * @brief 스위치에 입력이 들어올 때까지 기다리는 함수
- * 
- * @return enum switch_event_t 스위치의 눌림 이벤트 
-*/
-
 #endif
