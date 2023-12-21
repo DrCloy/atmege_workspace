@@ -1,3 +1,10 @@
+/**
+ * @file ds3231.h
+ * @brief Header file for using DS3231
+ * source : https://github.com/prestonsn/DS3231-RTC-AVR-Atmega-Library/blob/master/DS3231.h
+ * 
+*/
+
 #ifndef DS3231_h
 #define DS3231_h
 
