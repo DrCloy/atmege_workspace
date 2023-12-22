@@ -18,6 +18,6 @@ volatile static uint8_t fnd_value[] = {
 
 
 void fnd_init();
-void fnd_print(uint8_t *value, int dp_index);
+void fnd_print(char *value, int dp_index);
 
 #endif

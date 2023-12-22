@@ -86,3 +86,8 @@ void buzzer_make_sound(int buzzer_value) {
 
     buzzer_set_register(scale, octave);
 }
+
+void buzzer_onoff(int onoff) {
+    DDRB &= ~(1 << BUZZER_OUTPUT);
+    DDRB |= (onoff << BUZZER_OUTPUT);
+}

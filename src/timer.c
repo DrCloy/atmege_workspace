@@ -9,6 +9,8 @@
 /* Timer Interrupt에서 실행될 Method들이 있는 Module*/
 #include "led.h"
 #include "cds.h"
+#include "buzzer.h"
+#include "alarm.h"
 
 // 1ms마다 1씩 증가하는 counter
 // overflow는 약 49.7일에 한번씩 일어난다.
@@ -23,12 +25,31 @@ ISR(TIMER2_COMP_vect) {
     }
 
     // For each 100ms
-    if (timer2_counter % 100 == 0) {
+    if (timer2_counter % 100 == 0 && led_auto) {
         cds_sense();
         int led_current_state = led_onoff & ((!led_auto) | (led_auto & cds_is_sensed));
         if (led_current_state != led_is_enable) {
             led_is_enable = led_onoff & ((!led_auto) | (led_auto & cds_is_sensed));
             led_enable(led_is_enable);
+        }
+    }
+
+    // For each 1000ms = 1s
+    if (timer2_counter % 1000 == 0) {
+        if (alarm_is_added) {
+            if (alarm_is_on && !(alarm_is_start) && alarm_check_alarm()) {
+                alarm_is_start = 1;
+                alarm_start_time = timer2_counter;
+                buzzer_is_on = 1;
+                buzzer_make_sound(buzzer_default);
+                buzzer_onoff(1);
+            } 
+            // else if (alarm_is_start && ((timer2_counter - alarm_is_start) > ALARM_BUZZER_TIME)) {
+            //     alarm_is_start = 0;
+            //     buzzer_is_on = 0;
+            //     buzzer_make_sound(0);
+            // }
+
         }
     }
 }
