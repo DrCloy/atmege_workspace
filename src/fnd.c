@@ -31,7 +31,7 @@ void fnd_init() {
  * @param value 문자 0 ~ 9, 'A' ~ 'Z', 'a' ~ 'z' 중 하나
  * @return FND 출력 형식에 맞도록 변형된 PORTC 레지스터에 입력될 값 
 */
-uint8_t fnd_get_value(uint8_t value) {
+uint8_t fnd_get_value(char value) {
     if (value >= '0' && value <= '9') {
         return fnd_value[value - '0'];
     } else if (value >= 'A' && value <= 'Z') {
@@ -63,7 +63,7 @@ void fnd_write(uint8_t *value, int dp_index) {
  * @param value FND에 출력될 문자가 담긴 Array
  * @param dp_index FND의 Digit Point를 찍을 위치, 없으면 -1
 */
-void fnd_print(uint8_t *value, int dp_index) {
+void fnd_print(char *value, int dp_index) {
     uint8_t fnd_value[4];
     for (int i = 0; i < 4; i++) {
         fnd_value[i] = fnd_get_value(value[i]);
