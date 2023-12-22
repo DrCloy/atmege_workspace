@@ -7,6 +7,7 @@
 #define BUZZER_OUTPUT PB4
 
 volatile int buzzer_is_on = 0;
+volatile int buzzer_default = 0;
 
 const volatile char buzzer_scale[] = {'C', 'D', 'E', 'F', 'G', 'A', 'B'};
 const volatile float buzzer_tone[] = {32.7032, 36.7081, 41.2034, 43.6535, 48.9994, 55.0000, 61.7354}; // C0 ~ B0
