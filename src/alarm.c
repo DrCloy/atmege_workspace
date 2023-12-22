@@ -16,14 +16,6 @@ void alarm_set_alarm(rtc_t alarm_setting_time) {
     alarm_is_added = 1;
 }
 
-void alarm_on_alarm(int onoff){
-
-}
-
-void alarm_reset_alarm() {
-    alarm_is_added = 0;
-}
-
 int alarm_check_alarm() {
     rtc_t current_time;
     ds3231_getTime(&current_time);
