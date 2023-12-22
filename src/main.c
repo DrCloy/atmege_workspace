@@ -13,16 +13,17 @@
 // Menu 0 - 현재 시각 출력
 void print_time() {
 	rtc_t current_time;
+	char fnd_value[4];
 
 	while(!switch_read()) {
+		// DS3231로부터 현재 시간 받아오기
 		ds3231_getTime(&current_time);
 
-		uint8_t fnd_value[4];
+		// 현재 시간 출력
 		fnd_value[0] = '0' + (current_time.hour / 10);
 		fnd_value[1] = '0' + (current_time.hour % 10);
 		fnd_value[2] = '0' + (current_time.min / 10);
 		fnd_value[3] = '0' + (current_time.min % 10);
-
 		fnd_print(fnd_value, 1);
 	}
 }
@@ -30,13 +31,14 @@ void print_time() {
 // Menu 1 - 현재 시각 설정
 void set_time() {
 	rtc_t setting_time = {0, 0, 0};
-	uint8_t fnd_value[4];
+	char fnd_value[4];
 	int setting = 0;
 	int sw;
 
 	while(1) {
 		sw = switch_read();
 
+		// 현재 시각으로 설정할 시각 조절
 		if (sw == SWITCH_EVENT_BOTH) {
 			setting += 1;
 			if (setting == 2) {
@@ -68,20 +70,21 @@ void set_time() {
 			}
 		}
 
+		// 세팅 시간 출력
 		fnd_value[0] = ('0' + (setting_time.hour / 10)) * (setting == SETTING_HOUR);
 		fnd_value[1] = ('0' + (setting_time.hour % 10)) * (setting == SETTING_HOUR);
 		fnd_value[2] = ('0' + (setting_time.min / 10)) * (setting == SETTING_MIN);
 		fnd_value[3] = ('0' + (setting_time.min % 10)) * (setting == SETTING_MIN);
-
 		fnd_print(fnd_value, 1);
 	}
+	// 현재 시각 반영
 	ds3231_setTime(setting_time);
 }
 
 // Menu 2 - Cds 임계값 설정 
 void set_cds_threshold() {
 	int sw;
-	uint8_t fnd_value[4];
+	char fnd_value[4];
 
 	while(1) {
 		sw = switch_read();
@@ -92,13 +95,16 @@ void set_cds_threshold() {
 			cds_threshold += 1;
 		} else if (sw == SWITCH_EVENT_DOWN) {
 			cds_threshold -= 1;
+			if (cds_threshold < 0) {
+				cds_threshold = 0;
+			}
 		}
 
+		// 임계값 출력
 		fnd_value[0] = '0' + (cds_threshold / 1000);
 		fnd_value[1] = '0' + ((cds_threshold / 100) % 10);
 		fnd_value[2] = '0' + ((cds_threshold / 10) % 10);
 		fnd_value[3] = '0' + (cds_threshold % 10);
-
 		fnd_print(fnd_value, -1);
 	}
 }
@@ -106,7 +112,7 @@ void set_cds_threshold() {
 // Menu 3 - LEN On/Off 설정
 void set_led_onoff() {
 	int sw;
-	uint8_t fnd_value[4];
+	char fnd_value[4];
 
 	while(1) {
 		sw = switch_read();
@@ -135,7 +141,7 @@ void set_led_onoff() {
 // Menu 4 - 주변의 빛에 따라 LED 자동 On/Off 기능 설정 
 void set_led_auto() {
 	int sw;
-	uint8_t fnd_value[4];
+	char fnd_value[4];
 
 	while(1) {
 		sw = switch_read();
@@ -164,7 +170,7 @@ void set_led_auto() {
 void set_buzzer() {
 	int sw;
 	int buzzer_value = -1;
-	uint8_t fnd_value[4];
+	char fnd_value[4];
 
 	buzzer_is_on = 1;
 
@@ -179,6 +185,10 @@ void set_buzzer() {
 		} else if (sw == SWITCH_EVENT_DOWN) {
 			buzzer_value--;		
 			buzzer_make_sound(buzzer_value);
+		}
+
+		if (buzzer_value < -1) {
+			buzzer_value = -1;
 		}
 
 		if (buzzer_value < 0) {
@@ -196,12 +206,13 @@ void set_buzzer() {
 		fnd_print(fnd_value, -1);
 	}
 	buzzer_is_on = 0;
+	buzzer_default = buzzer_value;
 	buzzer_make_sound(buzzer_value);
 }
 
 // 기본 화면에서 메뉴 번호 출력
 void print_menu(int menu_index) {
-	uint8_t fnd_value[4];
+	char fnd_value[4];
 	fnd_value[0] = 'F';
 	fnd_value[1] = 'N';
 	fnd_value[2] = '0' + (menu_index / 10);
@@ -230,7 +241,7 @@ void init() {
 	fnd_init();
 	switch_init();
 	led_init();
-	led_enable(1);
+	// led_enable(1);
 	cds_init();
 	buzzer_init();
 	sei();
@@ -251,14 +262,16 @@ int main() {
         sw = switch_read();
         if (sw == SWITCH_EVENT_BOTH)
             menu[menu_index].func();
-        if (sw == SWITCH_EVENT_DOWN)
+        if (sw == SWITCH_EVENT_DOWN){
             menu_index--;
-        if (sw == SWITCH_EVENT_UP)
+			if (menu_index < 0)
+				menu_index = menu_index_max;
+		}
+        if (sw == SWITCH_EVENT_UP){
             menu_index++;
+			if (menu_index > menu_index_max)
+				menu_index = 0;
+		}
         
-        if (menu_index < 0)
-            menu_index = menu_index_max;
-        if (menu_index > menu_index_max)
-            menu_index = 0;
 	}
 }
